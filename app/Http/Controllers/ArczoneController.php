@@ -20,173 +20,29 @@ use DB;
 
 class ArczoneController extends Controller
 {
-	public function upload_new_member(Request $req)
-	{
-		$data = json_decode($req->data_input,true);
-		$update_local_id = array();
-
-		foreach ($data as $cus_info) 
-		{
-				$customer_info                  = new TblCustomerInfoModel;
-				$customer_info->customer_id 	= $cus_info['customer_id'];
-				$customer_info->first_name 		= $cus_info['first_name'];
-				$customer_info->last_name 		= $cus_info['last_name'];
-				$customer_info->gender 			= $cus_info['gender'];
-				$customer_info->birthday 		= $cus_info['birthday'];
-				$customer_info->contact_number 	= $cus_info['contact_number'];
-				$customer_info->address 		= $cus_info['address'];
-				$customer_info->balance 		= $cus_info['balance'];
-				$customer_info->points 			= $cus_info['points'];
-				$customer_info->membership 		= $cus_info['membership'];
-				$customer_info->user_level 		= $cus_info['user_level'];
-				$customer_info->password 		= $cus_info['password'];
-				$customer_info->profile_picture = $cus_info['profile_picture'];
-				$customer_info->save();
-
-				array_push($update_local_id,$cus_info['id']);//get local database id who insert in the database
-		}
-
-		return $update_local_id;
-	}
-	public function upload_new_dtr(Request $req)
-	{
-		$data = json_decode($req->data_input,true);
-		$update_local_id = array();
-
-		foreach ($data as $cus_dtr) 
-		{
-				$customer_daily_time_record                  	= new TblDailyTimeRecordModel;
-				$customer_daily_time_record->customer_id 		= $cus_dtr['customer_id'];
-				$customer_daily_time_record->first_name 		= $cus_dtr['first_name'];
-				$customer_daily_time_record->time_in 			= $cus_dtr['time_in'];
-				$customer_daily_time_record->time_out 			= $cus_dtr['time_out'];
-				$customer_daily_time_record->date 				= $cus_dtr['date'];
-				$customer_daily_time_record->membership 		= $cus_dtr['membership'];
-				$customer_daily_time_record->profit 			= $cus_dtr['profit'];
-				$customer_daily_time_record->expected_time_out 	= $cus_dtr['expected_time_out'];
-				$customer_daily_time_record->branch_id 			= $cus_dtr['branch_id'];
-				$customer_daily_time_record->cashier_name 		= $cus_dtr['cashier_name'];
-				$customer_daily_time_record->pc_name 			= $cus_dtr['pc_name'];
-				$customer_daily_time_record->pc_id 				= $cus_dtr['pc_id'];
-				$customer_daily_time_record->way_of_time_in 	= $cus_dtr['way_of_time_in'];
-				$customer_daily_time_record->upload_live 		= $cus_dtr['upload_live'];
-				$customer_daily_time_record->save();
-
-				array_push($update_local_id, $cus_dtr['id']);//get local database id who insert in the database
-		}
-		$update['db_version_number'] =  TblDbVersionNumberModel::where('version_number_id',1)->value('db_version_number') + 1;
-		$update_db = TblDbVersionNumberModel::where('version_number_id',1)->update($update);
-
-		return $update_local_id;
-	}
-	public function upload_new_pos(Request $req)
-	{
-		$data = json_decode($req->data_input,true);
-		$update_local_id = array();
-
-		foreach ($data as $branch_pos) 
-		{
-				$branch_point_of_sale                  	= new TblPointOfSaleModel;
-				$branch_point_of_sale->customer_id 		= $branch_pos['customer_id'];
-				$branch_point_of_sale->first_name 		= $branch_pos['first_name'];
-				$branch_point_of_sale->membership 		= $branch_pos['membership'];	
-				$branch_point_of_sale->purchased_time 	= $branch_pos['purchased_time'];
-				$branch_point_of_sale->purchased_date 	= $branch_pos['purchased_date'];
-				$branch_point_of_sale->purchased_item 	= $branch_pos['purchased_item'];
-				$branch_point_of_sale->consumed_item 	= $branch_pos['consumed_item'];
-				$branch_point_of_sale->quantity 		= $branch_pos['quantity'];
-				$branch_point_of_sale->way_of_purchased = $branch_pos['way_of_purchased'];
-				$branch_point_of_sale->price 			= $branch_pos['price'];
-				$branch_point_of_sale->get_load 		= $branch_pos['get_load'];
-				$branch_point_of_sale->branch_id 		= $branch_pos['branch_id'];
-				$branch_point_of_sale->cashier_name 	= $branch_pos['cashier_name'];
-				$branch_point_of_sale->upload_live 		= $branch_pos['upload_live'];
-				$branch_point_of_sale->save();
-
-				array_push($update_local_id, $branch_pos['id']);//get local database id who insert in the database
-		}
-
-		return $update_local_id;
-	}
-	public function upload_new_customer_balance(Request $req)
-	{
-		$data = json_decode($req->data_input,true);
-		$update_local_id = array();
-
-		foreach ($data as $cus_bal) 
-		{
-				$customer_balance                  	= new TblCustomerBalanceModel;
-				$customer_balance->customer_id 		= $cus_bal['customer_id'];
-				$customer_balance->customer_balance = $cus_bal['customer_balance'];
-				$customer_balance->customer_points 	= $cus_bal['customer_points'];
-				$customer_balance->time 			= $cus_bal['time'];
-				$customer_balance->date 			= $cus_bal['date'];
-				$customer_balance->description 		= $cus_bal['description'];
-				$customer_balance->upload_live 		= $cus_bal['upload_live'];
-
-				$customer_balance->save();
-
-				array_push($update_local_id, $cus_bal['id']);//get local database id who insert in the database
-		}
-
-		return $update_local_id;
-	}
-
-	public function upload_to_local_daily_time_records(Request $req)
-	{
-		$returndata = array();
-		$branch_id = json_decode($req->branch_id);
-		$get_all_dtr =  TblDailyTimeRecordModel::where('branch_id','!=',$branch_id)->get();
-		// array_push($returndata, $update_local_id);
-		array_push($returndata, $get_all_dtr);
-		//return $returndata;
-		return json_encode($get_all_dtr);
-	}
-
-	public function compare_localDB_liveDB(Request $req)
-	{
-		$db_version_local 	= json_decode($req->db_version,true);
-		$db_version_live 	= TblDbVersionNumberModel::where('version_number_id',1)->value('db_version_number');
-
-			if($db_version_live	 == $db_version_local)
-			{
-				$result = "equal";
-			}
-			else if($db_version_live < $db_version_local)
-			{
-				$result	 = "live less local";
-			}
-			else
-			{
-				$result	 = "live greater local";
-
-			}
-		return $result;
-	}
-
 	public static function foreach_tbl_condition_dtr($branch_id,$data_input,$local_to_live,$data_not_in_local)
 	{
 		$update_local_id = array();
 
 		foreach ($data_input as $cus_dtr) 
 		{
-				$customer_daily_time_record_local['customer_id'] 			= $cus_dtr->customer_id;
-				$customer_daily_time_record_local['first_name'] 			= $cus_dtr->first_name;
-				$customer_daily_time_record_local['time_in'] 				= $cus_dtr->time_in;
-				$customer_daily_time_record_local['time_out'] 				= $cus_dtr->time_out;
-				$customer_daily_time_record_local['date'] 					= $cus_dtr->date;
-				$customer_daily_time_record_local['membership'] 			= $cus_dtr->membership;
-				$customer_daily_time_record_local['profit'] 				= $cus_dtr->profit;
-				$customer_daily_time_record_local['expected_time_out'] 		= $cus_dtr->expected_time_out;
-				$customer_daily_time_record_local['branch_id'] 				= $cus_dtr->branch_id;
-				$customer_daily_time_record_local['cashier_name'] 			= $cus_dtr->cashier_name;
-				$customer_daily_time_record_local['pc_name'] 				= $cus_dtr->pc_name;
-				$customer_daily_time_record_local['pc_id'] 					= $cus_dtr->pc_id;
-				$customer_daily_time_record_local['way_of_time_in'] 		= $cus_dtr->way_of_time_in;
-				$customer_daily_time_record_local['upload_live'] 			= $cus_dtr->upload_live;
-				DB::table('tbl_daily_time_record_'.$branch_id)->insert($customer_daily_time_record_local);
+			$customer_daily_time_record_local['customer_id'] 			= $cus_dtr->customer_id;
+			$customer_daily_time_record_local['first_name'] 			= $cus_dtr->first_name;
+			$customer_daily_time_record_local['time_in'] 				= $cus_dtr->time_in;
+			$customer_daily_time_record_local['time_out'] 				= $cus_dtr->time_out;
+			$customer_daily_time_record_local['date'] 					= $cus_dtr->date;
+			$customer_daily_time_record_local['membership'] 			= $cus_dtr->membership;
+			$customer_daily_time_record_local['profit'] 				= $cus_dtr->profit;
+			$customer_daily_time_record_local['expected_time_out'] 		= $cus_dtr->expected_time_out;
+			$customer_daily_time_record_local['branch_id'] 				= $cus_dtr->branch_id;
+			$customer_daily_time_record_local['cashier_name'] 			= $cus_dtr->cashier_name;
+			$customer_daily_time_record_local['pc_name'] 				= $cus_dtr->pc_name;
+			$customer_daily_time_record_local['pc_id'] 					= $cus_dtr->pc_id;
+			$customer_daily_time_record_local['way_of_time_in'] 		= $cus_dtr->way_of_time_in;
+			$customer_daily_time_record_local['upload_live'] 			= $cus_dtr->upload_live;
+			DB::table('tbl_daily_time_record_'.$branch_id)->insert($customer_daily_time_record_local);
 
-				array_push($update_local_id, $cus_dtr->id);//get local database id who insert in the database
+			array_push($update_local_id, $cus_dtr->id);//get local database id who insert in the database
 		}
 
 		//compare local table to live table and insert data to live table the result of comparison
@@ -194,22 +50,56 @@ class ArczoneController extends Controller
 
 		foreach ($union_local_to_live as $cus_dtr_live) 
 		{
-				$customer_daily_time_record                  	= new TblDailyTimeRecordModel;
-				$customer_daily_time_record->customer_id 		= $cus_dtr_live->customer_id;
-				$customer_daily_time_record->first_name 		= $cus_dtr_live->first_name;
-				$customer_daily_time_record->time_in 			= $cus_dtr_live->time_in;
-				$customer_daily_time_record->time_out 			= $cus_dtr_live->time_out;
-				$customer_daily_time_record->date 				= $cus_dtr_live->date;
-				$customer_daily_time_record->membership 		= $cus_dtr_live->membership;
-				$customer_daily_time_record->profit 			= $cus_dtr_live->profit;
-				$customer_daily_time_record->expected_time_out 	= $cus_dtr_live->expected_time_out;
-				$customer_daily_time_record->branch_id 			= $cus_dtr_live->branch_id;
-				$customer_daily_time_record->cashier_name 		= $cus_dtr_live->cashier_name;
-				$customer_daily_time_record->pc_name 			= $cus_dtr_live->pc_name;
-				$customer_daily_time_record->pc_id 				= $cus_dtr_live->pc_id;
-				$customer_daily_time_record->way_of_time_in 	= $cus_dtr_live->way_of_time_in;
-				$customer_daily_time_record->upload_live 		= $cus_dtr_live->upload_live;
+			$count_if_data_exists										= TblDailyTimeRecordModel::where([
+																								['customer_id','=',$cus_dtr_live->customer_id],
+																								['time_in','=',$cus_dtr_live->time_in]
+																							])->count();
+			
+			//if data exist
+			//	update
+			//else
+			//	insert
+			if($count_if_data_exists > 0)
+			{
+				$update['customer_id'] 							= $cus_dtr_live->customer_id;
+				$update['first_name'] 							= $cus_dtr_live->first_name;
+				$update['time_in'] 								= $cus_dtr_live->time_in;
+				$update['time_out'] 							= $cus_dtr_live->time_out;
+				$update['date'] 								= $cus_dtr_live->date;
+				$update['membership'] 							= $cus_dtr_live->membership;
+				$update['profit'] 								= $cus_dtr_live->profit;
+				$update['expected_time_out'] 					= $cus_dtr_live->expected_time_out;
+				$update['branch_id'] 							= $cus_dtr_live->branch_id;
+				$update['cashier_name'] 						= $cus_dtr_live->cashier_name;
+				$update['pc_name'] 								= $cus_dtr_live->pc_name;
+				$update['pc_id'] 								= $cus_dtr_live->pc_id;
+				$update['way_of_time_in'] 						= $cus_dtr_live->way_of_time_in;
+				$update['upload_live'] 							= $cus_dtr_live->upload_live;
+
+				TblDailyTimeRecordModel::where([
+													['customer_id','=',$cus_dtr_live->customer_id],
+													['time_in','=',$cus_dtr_live->time_in]
+												])->update($update);
+			}
+			else
+			{
+				$customer_daily_time_record                  		= new TblDailyTimeRecordModel;
+				$customer_daily_time_record['customer_id'] 			= $cus_dtr_live->customer_id;
+				$customer_daily_time_record['first_name'] 			= $cus_dtr_live->first_name;
+				$customer_daily_time_record['time_in'] 				= $cus_dtr_live->time_in;
+				$customer_daily_time_record['time_out'] 			= $cus_dtr_live->time_out;
+				$customer_daily_time_record['date'] 				= $cus_dtr_live->date;
+				$customer_daily_time_record['membership'] 			= $cus_dtr_live->membership;
+				$customer_daily_time_record['profit'] 				= $cus_dtr_live->profit;
+				$customer_daily_time_record['expected_time_out'] 	= $cus_dtr_live->expected_time_out;
+				$customer_daily_time_record['branch_id'] 			= $cus_dtr_live->branch_id;
+				$customer_daily_time_record['cashier_name'] 		= $cus_dtr_live->cashier_name;
+				$customer_daily_time_record['pc_name'] 				= $cus_dtr_live->pc_name;
+				$customer_daily_time_record['pc_id'] 				= $cus_dtr_live->pc_id;
+				$customer_daily_time_record['way_of_time_in'] 		= $cus_dtr_live->way_of_time_in;
+				$customer_daily_time_record['upload_live'] 			= $cus_dtr_live->upload_live;
 				$customer_daily_time_record->save();
+			}
 		}
 
 		//get all data not in dummy table and export it to local db
@@ -251,6 +141,39 @@ class ArczoneController extends Controller
 
 		foreach ($union_local_to_live as $cus_pos_live) 
 		{
+			$count_if_data_exists										= TblPointOfSaleModel::where([
+																								['customer_id','=',$cus_pos_live->customer_id],
+																								['purchased_time','=',$cus_pos_live->purchased_time]
+																							])->count();
+			
+			//if data exist
+			//	update
+			//else
+			//	insert
+			if($count_if_data_exists > 0)
+			{
+				$update['customer_id'] 			= $cus_pos_live->customer_id;				
+				$update['first_name'] 			= $cus_pos_live->first_name;
+				$update['membership'] 			= $cus_pos_live->membership;
+				$update['purchased_time'] 		= $cus_pos_live->purchased_time;
+				$update['purchased_date'] 		= $cus_pos_live->purchased_date;
+				$update['purchased_item'] 		= $cus_pos_live->purchased_item;
+				$update['consumed_item'] 		= $cus_pos_live->consumed_item;
+				$update['quantity'] 			= $cus_pos_live->quantity;
+				$update['way_of_purchased'] 	= $cus_pos_live->way_of_purchased;
+				$update['price'] 				= $cus_pos_live->price;
+				$update['get_load'] 			= $cus_pos_live->get_load;
+				$update['branch_id'] 			= $cus_pos_live->branch_id;
+				$update['cashier_name'] 		= $cus_pos_live->cashier_name;
+				$update['upload_live'] 			= $cus_pos_live->upload_live;
+
+				TblPointOfSaleModel::where([
+													['customer_id','=',$cus_pos_live->customer_id],
+													['purchased_time','=',$cus_pos_live->purchased_time]
+												])->update($update);
+			}
+			else
+			{
 				$customer_point_of_sale                  		= new TblPointOfSaleModel;
 				$customer_point_of_sale['customer_id'] 			= $cus_pos_live->customer_id;				
 				$customer_point_of_sale['first_name'] 			= $cus_pos_live->first_name;
@@ -267,6 +190,7 @@ class ArczoneController extends Controller
 				$customer_point_of_sale['cashier_name'] 		= $cus_pos_live->cashier_name;
 				$customer_point_of_sale['upload_live'] 			= $cus_pos_live->upload_live;				
 				$customer_point_of_sale->save();
+			}
 		}
 
 		//get all data not in dummy table and export it to local db
@@ -302,15 +226,42 @@ class ArczoneController extends Controller
 
 		foreach ($union_local_to_live as $cus_bal_live) 
 		{
-			$customer_balance                  			= new TblCustomerBalanceModel;
-			$customer_balance['customer_id']			= $cus_bal_live->customer_id;
-			$customer_balance['customer_balance']		= $cus_bal_live->customer_balance;
-			$customer_balance['customer_points']		= $cus_bal_live->customer_points;
-			$customer_balance['time']					= $cus_bal_live->time;
-			$customer_balance['date']					= $cus_bal_live->date;
-			$customer_balance['description']			= $cus_bal_live->description;
-			$customer_balance['upload_live']			= $cus_bal_live->upload_live;				
-			$customer_balance->save();
+			$count_if_data_exists										= TblCustomerBalanceModel::where([
+																								['customer_id','=',$cus_bal_live->customer_id],
+																								['time','=',$cus_bal_live->time]
+																							])->count();
+			
+			//if data exist
+			//	update
+			//else
+			//	insert
+			if($count_if_data_exists > 0)
+			{
+				$update['customer_id']			= $cus_bal_live->customer_id;
+				$update['customer_balance']		= $cus_bal_live->customer_balance;
+				$update['customer_points']		= $cus_bal_live->customer_points;
+				$update['time']					= $cus_bal_live->time;
+				$update['date']					= $cus_bal_live->date;
+				$update['description']			= $cus_bal_live->description;
+				$update['upload_live']			= $cus_bal_live->upload_live;		
+
+				TblCustomerBalanceModel::where([
+													['customer_id','=',$cus_bal_live->customer_id],
+													['time','=',$cus_bal_live->time]
+												])->update($update);
+			}
+			else
+			{
+				$customer_balance                  			= new TblCustomerBalanceModel;
+				$customer_balance['customer_id']			= $cus_bal_live->customer_id;
+				$customer_balance['customer_balance']		= $cus_bal_live->customer_balance;
+				$customer_balance['customer_points']		= $cus_bal_live->customer_points;
+				$customer_balance['time']					= $cus_bal_live->time;
+				$customer_balance['date']					= $cus_bal_live->date;
+				$customer_balance['description']			= $cus_bal_live->description;
+				$customer_balance['upload_live']			= $cus_bal_live->upload_live;				
+				$customer_balance->save();
+			}
 		}
 
 		//get all data not in dummy table and export it to local db
@@ -323,7 +274,7 @@ class ArczoneController extends Controller
 
 	}
 
-		public static function foreach_tbl_condition_cus_info($branch_id,$data_input,$local_to_live,$data_not_in_local)
+	public static function foreach_tbl_condition_cus_info($branch_id,$data_input,$local_to_live,$data_not_in_local)
 	{
 		$update_local_id = array();
 
@@ -354,23 +305,58 @@ class ArczoneController extends Controller
 
 		foreach ($union_local_to_live as $cus_info_live) 
 		{
-			$customer_info                  	= new TblCustomerInfoModel;
-			$customer_info['customer_id']  		= $cus_info_live->customer_id; 
-			$customer_info['first_name'] 		= $cus_info_live->first_name;
-			$customer_info['last_name']  		= $cus_info_live->last_name; 
-			$customer_info['gender'] 			= $cus_info_live->gender;
-			$customer_info['birthday'] 			= $cus_info_live->birthday;
-			$customer_info['contact_number']  	= $cus_info_live->contact_number; 
-			$customer_info['address']  			= $cus_info_live->address; 
-			$customer_info['balance']  			= $cus_info_live->balance; 
-			$customer_info['points'] 			= $cus_info_live->points;
-			$customer_info['membership'] 		= $cus_info_live->membership;
-			$customer_info['user_level']  		= $cus_info_live->user_level; 
-			$customer_info['password']   		= $cus_info_live->password;  
-			$customer_info['profile_picture']  	= $cus_info_live->profile_picture; 
-			$customer_info['member_create']  	= $cus_info_live->member_create; 
-			$customer_info['upload_live'] 		= $cus_info_live->upload_live;				
-			$customer_info->save();
+			$count_if_data_exists										= TblCustomerInfoModel::where([
+																								['customer_id','=',$cus_info_live->customer_id],
+																								['member_create','=',$cus_info_live->member_create]
+																							])->count();
+			
+			//if data exist
+			//	update
+			//else
+			//	insert
+			if($count_if_data_exists > 0)
+			{
+				$update['customer_id']  		= $cus_info_live->customer_id; 
+				$update['first_name'] 		= $cus_info_live->first_name;
+				$update['last_name']  		= $cus_info_live->last_name; 
+				$update['gender'] 			= $cus_info_live->gender;
+				$update['birthday'] 			= $cus_info_live->birthday;
+				$update['contact_number']  	= $cus_info_live->contact_number; 
+				$update['address']  			= $cus_info_live->address; 
+				$update['balance']  			= $cus_info_live->balance; 
+				$update['points'] 			= $cus_info_live->points;
+				$update['membership'] 		= $cus_info_live->membership;
+				$update['user_level']  		= $cus_info_live->user_level; 
+				$update['password']   		= $cus_info_live->password;  
+				$update['profile_picture']  	= $cus_info_live->profile_picture; 
+				$update['member_create']  	= $cus_info_live->member_create; 
+				$update['upload_live'] 		= $cus_info_live->upload_live;		
+
+				TblCustomerInfoModel::where([
+													['customer_id','=',$cus_info_live->customer_id],
+													['member_create','=',$cus_info_live->member_create]
+												])->update($update);
+			}
+			else
+			{
+				$customer_info                  	= new TblCustomerInfoModel;
+				$customer_info['customer_id']  		= $cus_info_live->customer_id; 
+				$customer_info['first_name'] 		= $cus_info_live->first_name;
+				$customer_info['last_name']  		= $cus_info_live->last_name; 
+				$customer_info['gender'] 			= $cus_info_live->gender;
+				$customer_info['birthday'] 			= $cus_info_live->birthday;
+				$customer_info['contact_number']  	= $cus_info_live->contact_number; 
+				$customer_info['address']  			= $cus_info_live->address; 
+				$customer_info['balance']  			= $cus_info_live->balance; 
+				$customer_info['points'] 			= $cus_info_live->points;
+				$customer_info['membership'] 		= $cus_info_live->membership;
+				$customer_info['user_level']  		= $cus_info_live->user_level; 
+				$customer_info['password']   		= $cus_info_live->password;  
+				$customer_info['profile_picture']  	= $cus_info_live->profile_picture; 
+				$customer_info['member_create']  	= $cus_info_live->member_create; 
+				$customer_info['upload_live'] 		= $cus_info_live->upload_live;				
+				$customer_info->save();
+			}
 		}
 
 		//get all data not in dummy table and export it to local db
@@ -418,13 +404,17 @@ class ArczoneController extends Controller
 								UNION ALL
 								select * from tbl_point_of_sale_".$branch_id.")tbl_select_data
 								WHERE NOT EXISTS (Select * from tbl_point_of_sale where tbl_select_data.purchased_time = tbl_point_of_sale.purchased_time)
-								or NOT EXISTS (Select * from tbl_point_of_sale where tbl_select_data.customer_id = tbl_point_of_sale.customer_id)";
+								or NOT EXISTS (Select * from tbl_point_of_sale where tbl_select_data.customer_id = tbl_point_of_sale.customer_id)
+								or NOT EXISTS (Select * from tbl_point_of_sale where tbl_select_data.price = tbl_point_of_sale.price)
+								or NOT EXISTS (Select * from tbl_point_of_sale where tbl_select_data.get_load= tbl_point_of_sale.get_load)";
 				$data_not_in_local = "SELECT * 
 								FROM (select * from tbl_point_of_sale_".$branch_id."
 								UNION ALL
 								select * from tbl_point_of_sale)tbl_select_data
 								WHERE NOT EXISTS (Select * from tbl_point_of_sale_".$branch_id." where tbl_select_data.purchased_time = tbl_point_of_sale_".$branch_id.".purchased_time)
-								or NOT EXISTS (Select * from tbl_point_of_sale_".$branch_id." where tbl_select_data.customer_id = tbl_point_of_sale_".$branch_id.".customer_id)";
+								or NOT EXISTS (Select * from tbl_point_of_sale_".$branch_id." where tbl_select_data.customer_id = tbl_point_of_sale_".$branch_id.".customer_id)
+								or NOT EXISTS (Select * from tbl_point_of_sale_".$branch_id." where tbl_select_data.price = tbl_point_of_sale_".$branch_id.".price)
+								or NOT EXISTS (Select * from tbl_point_of_sale_".$branch_id." where tbl_select_data.get_load= tbl_point_of_sale_".$branch_id.".get_load)";
 
 				$data['tbl_result_foreach'] = Self::foreach_tbl_condition_pos($branch_id,$data_input,$local_to_live,$data_not_in_local);
 				break;
@@ -435,13 +425,17 @@ class ArczoneController extends Controller
 								UNION ALL
 								select * from tbl_customer_balance_".$branch_id.")tbl_select_data
 								WHERE NOT EXISTS (Select * from tbl_customer_balance where tbl_select_data.time = tbl_customer_balance.time)
-								or NOT EXISTS (Select * from tbl_customer_balance where tbl_select_data.customer_id = tbl_customer_balance.customer_id)";
+								or NOT EXISTS (Select * from tbl_customer_balance where tbl_select_data.customer_id = tbl_customer_balance.customer_id)
+								or NOT EXISTS (Select * from tbl_customer_balance where tbl_select_data.customer_balance = tbl_customer_balance.customer_balance)
+								or NOT EXISTS (Select * from tbl_customer_balance where tbl_select_data.customer_points = tbl_customer_balance.customer_points)";
 				$data_not_in_local = "SELECT * 
 								FROM (select * from tbl_customer_balance_".$branch_id."
 								UNION ALL
 								select * from tbl_customer_balance)tbl_select_data
 								WHERE NOT EXISTS (Select * from tbl_customer_balance_".$branch_id." where tbl_select_data.time = tbl_customer_balance_".$branch_id.".time)
-								or NOT EXISTS (Select * from tbl_customer_balance_".$branch_id." where tbl_select_data.customer_id = tbl_customer_balance_".$branch_id.".customer_id)";
+								or NOT EXISTS (Select * from tbl_customer_balance_".$branch_id." where tbl_select_data.customer_id = tbl_customer_balance_".$branch_id.".customer_id)
+								or NOT EXISTS (Select * from tbl_customer_balance_".$branch_id." where tbl_select_data.customer_balance = tbl_customer_balance_".$branch_id.".customer_balance)
+								or NOT EXISTS (Select * from tbl_customer_balance_".$branch_id." where tbl_select_data.customer_points = tbl_customer_balance_".$branch_id.".customer_points)";
 
 				$data['tbl_result_foreach'] = Self::foreach_tbl_condition_cus_bal($branch_id,$data_input,$local_to_live,$data_not_in_local);
 				break;
@@ -451,12 +445,14 @@ class ArczoneController extends Controller
 								FROM (select * from tbl_customer_info 
 								UNION ALL
 								select * from tbl_customer_info_".$branch_id.")tbl_select_data
-								WHERE NOT EXISTS (Select * from tbl_customer_info where tbl_select_data.customer_id = tbl_customer_info.customer_id)";
+								WHERE NOT EXISTS (Select * from tbl_customer_info where tbl_select_data.customer_id = tbl_customer_info.customer_id)
+								or NOT EXISTS (Select * from tbl_customer_info where tbl_select_data.membership = tbl_customer_info.membership)";
 				$data_not_in_local = "SELECT * 
 								FROM (select * from tbl_customer_info_".$branch_id."
 								UNION ALL
 								select * from tbl_customer_info)tbl_select_data
-								WHERE NOT EXISTS (Select * from tbl_customer_info_".$branch_id." where tbl_select_data.customer_id = tbl_customer_info_".$branch_id.".customer_id)";
+								WHERE NOT EXISTS (Select * from tbl_customer_info_".$branch_id." where tbl_select_data.customer_id = tbl_customer_info_".$branch_id.".customer_id)
+								or NOT EXISTS (Select * from tbl_customer_info_".$branch_id." where tbl_select_data.membership = tbl_customer_info_".$branch_id.".membership)";
 
 				$data['tbl_result_foreach'] = Self::foreach_tbl_condition_cus_info($branch_id,$data_input,$local_to_live,$data_not_in_local);
 				break;
