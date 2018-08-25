@@ -141,10 +141,10 @@ class ArczoneController extends Controller
 
 		foreach ($union_local_to_live as $cus_pos_live) 
 		{
-			$count_if_data_exists										= TblPointOfSaleModel::where([
-																								['customer_id','=',$cus_pos_live->customer_id],
-																								['purchased_time','=',$cus_pos_live->purchased_time]
-																							])->count();
+			$count_if_data_exists				= TblPointOfSaleModel::where([
+																			['customer_id','=',$cus_pos_live->customer_id],
+																			['purchased_time','=',$cus_pos_live->purchased_time]
+																			])->count();
 			
 			//if data exist
 			//	update
@@ -168,9 +168,9 @@ class ArczoneController extends Controller
 				$update['upload_live'] 			= $cus_pos_live->upload_live;
 
 				TblPointOfSaleModel::where([
-													['customer_id','=',$cus_pos_live->customer_id],
-													['purchased_time','=',$cus_pos_live->purchased_time]
-												])->update($update);
+											['customer_id','=',$cus_pos_live->customer_id],
+											['purchased_time','=',$cus_pos_live->purchased_time]
+											])->update($update);
 			}
 			else
 			{
